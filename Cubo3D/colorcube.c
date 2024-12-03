@@ -46,40 +46,41 @@ void tempo()
 
 }
 
-void polygon(int a, int b, int c, int d)
+void polygon(int a, int b, int c, int d, int faceColor)
 {
-
-	/* draw a polygon via list of vertices */
+	/* Draw a polygon with a single solid color for the entire face */
 
 	glBegin(GL_POLYGON);
-	glColor3fv(colors[a]);
+	glColor3fv(colors[faceColor]); // Set the face color
+
 	glNormal3fv(normals[a]);
 	glVertex3fv(vertices[a]);
-	glColor3fv(colors[b]);
+
 	glNormal3fv(normals[b]);
 	glVertex3fv(vertices[b]);
-	glColor3fv(colors[c]);
+
 	glNormal3fv(normals[c]);
 	glVertex3fv(vertices[c]);
-	glColor3fv(colors[d]);
+
 	glNormal3fv(normals[d]);
 	glVertex3fv(vertices[d]);
+
 	glEnd();
 }
 
 
+
 void colorcube(void)
 {
-
-	/* map vertices to faces */
-
-	polygon(0, 3, 2, 1);
-	polygon(2, 3, 7, 6);
-	polygon(0, 4, 7, 3);
-	polygon(1, 2, 6, 5);
-	polygon(4, 5, 6, 7);
-	polygon(0, 1, 5, 4);
+    /* Map vertices to faces with unique colors */
+    polygon(0, 3, 2, 1, 0); // Face 1: Cor 0
+    polygon(2, 3, 7, 6, 1); // Face 2: Cor 1
+    polygon(0, 4, 7, 3, 2); // Face 3: Cor 2
+    polygon(1, 2, 6, 5, 3); // Face 4: Cor 3
+    polygon(4, 5, 6, 7, 4); // Face 5: Cor 4
+    polygon(0, 1, 5, 4, 5); // Face 6: Cor 5
 }
+
 
 void teclado(char key, int x, int y) {
 	switch (key)
@@ -126,22 +127,25 @@ void especialTeclado(char key, int x, int y) {
 	switch (key)
 	{
 	case GLUT_KEY_UP:
-		yCubo += 0.1;
-
+		axis = 0;
+		theta[axis] += 2.0;
 		glutPostRedisplay();
 		break;
 	case GLUT_KEY_DOWN:
-		yCubo -= 0.1;
+		axis = 0;
+		theta[axis] -= 2.0;
 
 		glutPostRedisplay();
 		break;
 	case GLUT_KEY_LEFT:
-		xCubo -= 0.1;
+		axis = 1;
+		theta[axis] -= 2.0;
 
 		glutPostRedisplay();
 		break;
 	case GLUT_KEY_RIGHT:
-		xCubo += 0.1;
+		axis = 1;
+		theta[axis] += 2.0;
 		glutPostRedisplay();
 		break;
 	default:
@@ -172,36 +176,55 @@ void drawMainAxis() {
 
 
 
-
-void display(void)
-{
-	/* display callback, clear frame buffer and z buffer,
-	   rotate cube and draw, swap buffers */
-
+void display(void) {
+	/* Limpa o buffer de cor e profundidade */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	/* Reseta as transformações */
 	glLoadIdentity();
 
-	
+	// Cubo 1
+	glPushMatrix();
+	glTranslatef(-2.0 + xCubo, yCubo, 0.0); // Move o cubo para a esquerda
+	glRotatef(theta[0], 1.0, 0.0, 0.0);    // Rotação em X
+	glRotatef(theta[1], 0.0, 1.0, 0.0);    // Rotação em Y
+	glRotatef(theta[2], 0.0, 0.0, 1.0);    // Rotação em Z
+	glScalef(escala, escala, escala);      // Escala
 
-	glTranslatef(xCubo, yCubo, 0.0);
+	colorcube();  // Desenha o cubo
+	drawMainAxis(); // Desenha os eixos para este cubo
+	glPopMatrix();
 
-	glRotatef(theta[0], 1.0, 0.0, 0.0);
-	glRotatef(theta[1], 0.0, 1.0, 0.0);
-	glRotatef(theta[2], 0.0, 0.0, 1.0);
+	// Cubo 2
+	glPushMatrix();
+	glTranslatef(0.0 + xCubo, yCubo, 0.0); // Não move horizontalmente
+	glRotatef(theta[0], 1.0, 0.0, 0.0);    // Rotação em X
+	glRotatef(theta[1], 0.0, 1.0, 0.0);    // Rotação em Y
+	glRotatef(theta[2], 0.0, 0.0, 1.0);    // Rotação em Z
+	glScalef(escala, escala, escala);      // Escala
 
-	glScalef(escala, escala, escala);
+	colorcube();  // Desenha o cubo
+	drawMainAxis(); // Desenha os eixos para este cubo
+	glPopMatrix();
 
-	colorcube();
-	drawMainAxis();
+	// Cubo 3
+	glPushMatrix();
+	glTranslatef(2.0 + xCubo, yCubo, 0.0); // Move o cubo para a direita
+	glRotatef(theta[0], 1.0, 0.0, 0.0);    // Rotação em X
+	glRotatef(theta[1], 0.0, 1.0, 0.0);    // Rotação em Y
+	glRotatef(theta[2], 0.0, 0.0, 1.0);    // Rotação em Z
+	glScalef(escala, escala, escala);      // Escala
 
+	colorcube();  // Desenha o cubo
+	drawMainAxis(); // Desenha os eixos para este cubo
+	glPopMatrix();
 
+	/* Força a execução imediata */
 	glFlush();
-
-	tempo();
-
-	//glutSwapBuffers();
 }
+
+
+
 
 void spinCube()
 {
@@ -255,7 +278,7 @@ main(int argc, char** argv)
 	glutSpecialFunc(especialTeclado);
 	glutReshapeFunc(myReshape);
 	glutDisplayFunc(display);
-	glutIdleFunc(spinCube);
+	//glutIdleFunc(spinCube);
 	glutMouseFunc(mouse);
 	glEnable(GL_DEPTH_TEST); /* Enable hidden--surface--removal */
 	glutMainLoop();
