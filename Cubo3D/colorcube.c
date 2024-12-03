@@ -28,6 +28,14 @@ GLfloat colors[][3] = { {0.0,0.0,0.0},{1.0,0.0,0.0},
 {1.0,1.0,0.0}, {0.0,1.0,0.0}, {0.0,0.0,1.0},
 {1.0,0.0,1.0}, {1.0,1.0,1.0}, {0.0,1.0,1.0} };
 
+//variaveis globais
+static GLfloat theta[] = { 0.0,0.0,0.0 };
+static GLint axis = 2;
+
+float escala = 0.5;
+float xCubo = 0;
+float yCubo = 0;
+
 
 void tempo()
 {
@@ -73,25 +81,69 @@ void colorcube(void)
 	polygon(0, 1, 5, 4);
 }
 
+void teclado(char key, int x, int y) {
+	switch (key)
+	{
+	case '+':
+		escala += 0.1;
+
+		glutPostRedisplay();
+		break;
+	case '-':
+		escala -= 0.1;
+
+		glutPostRedisplay();
+		break;
+	case 'w':
+	case 'W':	
+		yCubo += 0.1;
+
+		glutPostRedisplay();
+		break;
+	case 's':
+	case 'S':
+		yCubo -= 0.1;
+
+		glutPostRedisplay();
+		break;
+	case 'a':
+	case 'A':
+		xCubo -= 0.1;
+
+		glutPostRedisplay();
+		break;
+	case 'd':
+	case 'D':
+		xCubo += 0.1;
+		glutPostRedisplay();
+		break;
+	default:
+		break;
+	}
+}
+
 void drawMainAxis() {
 	glLineWidth(2.0); // Adiciona espessura às linhas
+
 	glBegin(GL_LINES);
 	glColor3f(1.0, 0.0, 0.0); // Eixo X
 	glVertex3f(-1.5, 0.0, 0.0);
 	glVertex3f(1.5, 0.0, 0.0);
+
 	glColor3f(0.0, 1.0, 0.0); // Eixo Y
 	glVertex3f(0.0, -1.5, 0.0);
 	glVertex3f(0.0, 1.5, 0.0);
+
 	glColor3f(0.0, 0.0, 1.0); // Eixo Z
 	glVertex3f(0.0, 0.0, -1.5);
 	glVertex3f(0.0, 0.0, 1.5);
+
 	glEnd();
 	glLineWidth(1.0); // Volta à espessura padrão
 }
 
 
-static GLfloat theta[] = { 0.0,0.0,0.0 };
-static GLint axis = 2;
+
 
 void display(void)
 {
@@ -102,9 +154,15 @@ void display(void)
 
 	glLoadIdentity();
 
+	
+
+	glTranslatef(xCubo, yCubo, 0.0);
+
 	glRotatef(theta[0], 1.0, 0.0, 0.0);
 	glRotatef(theta[1], 0.0, 1.0, 0.0);
 	glRotatef(theta[2], 0.0, 0.0, 1.0);
+
+	glScalef(escala, escala, escala);
 
 	colorcube();
 	drawMainAxis();
@@ -163,6 +221,8 @@ main(int argc, char** argv)
 
 	glutInitWindowSize(500, 500);
 	glutCreateWindow("colorcube");
+	//teclado
+	glutKeyboardFunc(teclado);
 	glutReshapeFunc(myReshape);
 	glutDisplayFunc(display);
 	glutIdleFunc(spinCube);
