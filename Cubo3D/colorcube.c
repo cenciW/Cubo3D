@@ -122,6 +122,34 @@ void teclado(char key, int x, int y) {
 	}
 }
 
+void especialTeclado(char key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		yCubo += 0.1;
+
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_DOWN:
+		yCubo -= 0.1;
+
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_LEFT:
+		xCubo -= 0.1;
+
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_RIGHT:
+		xCubo += 0.1;
+		glutPostRedisplay();
+		break;
+	default:
+		break;
+	}
+
+}
+
 void drawMainAxis() {
 	glLineWidth(2.0); // Adiciona espessura às linhas
 
@@ -223,6 +251,8 @@ main(int argc, char** argv)
 	glutCreateWindow("colorcube");
 	//teclado
 	glutKeyboardFunc(teclado);
+	//especial teclado
+	glutSpecialFunc(especialTeclado);
 	glutReshapeFunc(myReshape);
 	glutDisplayFunc(display);
 	glutIdleFunc(spinCube);
