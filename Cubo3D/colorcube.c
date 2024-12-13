@@ -28,6 +28,8 @@ GLfloat colors[][3] = { {0.0,0.0,0.0},{1.0,0.0,0.0},
 #define TIME 40
 #define NCubos 2
 
+
+//pode ter a velocidade e o angulo para saber para onde quer ir ( seno e cosseno)
 struct cubo {
 	float theta[3];
 	float escala;
@@ -35,11 +37,17 @@ struct cubo {
 	float yCubo;
 	float velocityX;
 	float velocityY;
+
 };
 
+
+//variaveis globais
 struct cubo cubos[NCubos];
 int selectedCubo = 0;
 float velocity = 0.5; //velocidade em unidades do mundo por segundo
+
+float internalPosition = 0.0;
+float internalVelocity = 2.5;
 
 
 void init() {
@@ -205,6 +213,8 @@ void desenharCubo(int i) {
 	glRotatef(cubos[i].theta[1], 0.0, 1.0, 0.0);
 	glRotatef(cubos[i].theta[2], 0.0, 0.0, 1.0);
 
+	glRotatef(internalPosition*60, 0.0, 1.0, 0.0);
+
 	glScalef(cubos[i].escala, cubos[i].escala, cubos[i].escala);
 
 	cuboMagico(3);
@@ -231,8 +241,22 @@ void updateCubo(int iCubo) {
 void update(int value) {
 	printf("Some time...\n");
 
+	
+	internalPosition += internalVelocity * (TIME / 1000.0);
+
+	if (internalPosition >= 1.0) {
+		internalVelocity *= -1;
+		internalPosition = 1.0;
+	}
+
+	if (internalPosition <= -1.0) {
+		internalVelocity *= -1;
+		internalPosition = -1.0;
+	}
+	
 	updateCubo(0);
 	updateCubo(1);
+
 
 	glutPostRedisplay();
 
